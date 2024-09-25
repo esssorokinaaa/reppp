@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Решение квадратных уравнений</title>
+</head>
+<body>
+    <h1>Решение квадратных уравнений</h1>
+    <form action="/solve" method="post">
+        <label for="a">Коэффициент a: </label><input type="number" name="a" required><br />
+        <label for="b">Коэффициент b: </label><input type="number" name="b" required><br />
+        <label for="c">Свободный член c: </label><input type="number" name="c" required><br />
+        <button type="submit">Найти корни</button>
+    </form>
+    
+    {% if result %}
+    <h2>Результаты:</h2>
+    <ul>
+        {% for root in result %}
+        <li>{{ root }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    <script>
+        document.querySelector('form').addEventListener('submit', e => {
+            e.preventDefault()
+            
+            let formData = new FormData(e.target)
+            fetch('/solve', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    location.href = '/result?q=' + encodeURIComponent(JSON.stringify(result.roots))
+                } else {
+                    alert('Не удалось найти решение')
+                }
+            })
+        })
+    </script>
+</body>
+</html>
