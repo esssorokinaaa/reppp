@@ -1,0 +1,37 @@
+from flask import Flask, render_template, request, jsonify
+import math
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET'])
+def homepage():
+    return render_template('index.html')
+
+@app.route('/solve', methods=['POST'])
+def solve_equation():
+    a = float(request.form['a'])
+    b = float(request.form['b'])
+    c = float(request.form['c'])
+
+    discriminant = b ** 2 - 4 * a * c
+    roots = []
+
+    if discriminant >= 0:
+        root1 = (-b + math.sqrt(discriminant)) / (2 * a)
+        root2 = (-b - math.sqrt(discriminant)) / (2 * a)
+        roots = sorted([root1, root2])
+    elif discriminant == 0:
+        roots = [-b / (2 * a)]
+    else:
+        return jsonify({'success': False}), 200
+
+    return jsonify({'success': True, 'roots': roots})
+
+@app.route('/result', methods=['GET'])
+def show_result():
+    q = request.args.get('q')
+    results = eval(q)
+    return render_template('result.html', result=results)
+
+if __name__ == '__main__':
+    app.run(debug=True)
